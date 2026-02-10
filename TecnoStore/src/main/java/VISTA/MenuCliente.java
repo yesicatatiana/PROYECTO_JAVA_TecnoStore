@@ -7,31 +7,71 @@ package VISTA;
 import CONTROLAOR.GestionarCliente;
 import CONTROLAOR.GestionarClienteImpl;
 import MODELO.Cliente;
-import java.util.ArrayList;
 import java.util.Scanner;
 
-/**
- *
- * @author camper
- */
+   
+
+
+
 public class MenuCliente {
 
     GestionarCliente gc = new GestionarClienteImpl();
-   
+    Scanner sc = new Scanner(System.in);
+
+    // 🔹 MÉTODO FUERA del registrar
+    public static boolean correoValido(String email) {
+        if (email == null) return false;
+
+        int primeraArroba = email.indexOf("@");
+        int ultimaArroba = email.lastIndexOf("@");
+
+        return primeraArroba != -1 && primeraArroba == ultimaArroba;
+    }
+
+    
+    
     private void registrar() {
         Cliente cl = new Cliente();
-        System.out.println("Ingrese el nombre:");
-        cl.setNombre(new Scanner(System.in).nextLine());
-        System.out.println("Ingrese su identificacion:");
-        cl.setIdentificacion(new Scanner(System.in).nextLine());
-        System.out.println("Ingrese su correo:");
-        cl.setCorreo(new Scanner(System.in).nextLine());
-        System.out.println("Ingrese su telefono:");
-        cl.setTelefono(new Scanner(System.in).nextLine());
-        gc.guardar(cl);
-    }
-    
 
+        System.out.println("Ingrese el nombre:");
+        cl.setNombre(sc.nextLine());
+
+        System.out.println("Ingrese su identificacion:");
+        cl.setIdentificacion(sc.nextLine());
+
+        String email;
+
+        // 🔁 Repetir hasta que el correo sea válido
+        while (true) {
+            System.out.println("Ingrese su correo:");
+            email = sc.nextLine();
+
+            if (!correoValido(email)) {
+                System.out.println("❌ El correo debe tener SOLO un @");
+            } else {
+                break;
+            }
+        }
+
+        cl.setCorreo(email);
+
+        System.out.println("Ingrese su telefono:");
+        cl.setTelefono(sc.nextLine());
+
+        gc.guardar(cl);
+
+        System.out.println("✅ Cliente registrado correctamente");
+    }
+}
+
+
+
+
+
+
+
+
+/*
   private void actualizar() {
         System.out.println("Ingrese el id de la empleado a buscar");
         int id = new Scanner(System.in).nextInt();
@@ -137,3 +177,5 @@ public class MenuCliente {
         } while (op != 6);
     }
 }
+
+*/

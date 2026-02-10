@@ -8,7 +8,7 @@ public class Conexion {
     public connection conectar() {
         connection c = null;
         try {
-            c = DriverManager.getConnection("jdbc:mysql:localhost:3306/TecnoStore", "root", "123");
+            c = DriverManager.getConnection("jdbc:mysql:localhost:3306/TecnoStore", "campius2023", "campus2023");
             System.out.println("CONEXION ESTABLECIDA CORRECTA");
         } catch (SQLException e) {
             System.out.println(e.getMessage());
