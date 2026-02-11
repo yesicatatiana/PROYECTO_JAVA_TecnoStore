@@ -8,6 +8,6 @@ package MODELO;
  *
  * @author camper
  */
-public class venta {
+public class Celular {
     
 }

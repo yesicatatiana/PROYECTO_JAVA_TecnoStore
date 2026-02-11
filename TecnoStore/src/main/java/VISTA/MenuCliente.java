@@ -47,7 +47,7 @@ public class MenuCliente {
             email = sc.nextLine();
 
             if (!correoValido(email)) {
-                System.out.println("❌ El correo debe tener SOLO un @");
+                System.out.println(" El correo debe tener SOLO un @");
             } else {
                 break;
             }
@@ -56,11 +56,11 @@ public class MenuCliente {
         cl.setCorreo(email);
 
         System.out.println("Ingrese su telefono:");
-        cl.setTelefono(sc.nextLine());
+        cl.setCelular(sc.nextLine());
 
         gc.guardar(cl);
 
-        System.out.println("✅ Cliente registrado correctamente");
+        System.out.println("Cliente registrado correctamente");
     }
 }
 

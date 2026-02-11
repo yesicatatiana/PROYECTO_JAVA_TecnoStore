@@ -9,5 +9,15 @@ package MODELO;
  * @author camper
  */
 public class Cliente {
-    
-}
+
+    private int id;
+    private String nombre, identificacion, correo,telefono;
+
+
+    public Empleado(int id, String nombre, String identificacion, String correo, Area area_id) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.telefono = telefono;
+        this.area_id = area_id;
+    }

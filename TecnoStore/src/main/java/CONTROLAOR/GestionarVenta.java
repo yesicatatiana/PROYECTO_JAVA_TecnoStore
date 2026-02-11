@@ -1,13 +1,12 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package CONTROLAOR;
 
-/**
- *
- * @author camper
- */
+
+    import MODELO.Venta;
+
 public class GestionarVenta {
-    
+
+    public interface GestionarVenta {
+        void guardar(Venta venta);
+    }
 }

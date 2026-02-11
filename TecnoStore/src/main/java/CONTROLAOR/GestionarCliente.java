@@ -5,17 +5,12 @@
 package CONTROLAOR;
 
 import MODELO.Cliente;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface GestionarCliente {
 
-    void guardar(Cliente a);
-
-    void actualizar(Cliente a, int id);
-
-    void eliminar(int id);
-
-    ArrayList<Cliente> listar();
-
-    Cliente buscar(int id);
+    void guardar(Cliente cliente);
+    List<Cliente> listar();
+    void actualizar(String identificacion, Cliente nuevoCliente);
+    void eliminar(String identificacion);
 }
