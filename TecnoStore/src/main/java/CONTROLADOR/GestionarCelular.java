@@ -1,13 +1,18 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package CONTROLADOR;
 
-/**
- *
- * @author camper
- */
-public class GestionarCelular {
-    
+import MODELO.Celular;
+import java.util.ArrayList;
+
+public interface GestionarCelular {
+
+    void guardar(Celular c);
+
+    void actualizar(Celular c, int id);
+
+    void eliminar(int id);
+
+    ArrayList<Celular> listar();
+
+    Celular buscar(int id);
 }

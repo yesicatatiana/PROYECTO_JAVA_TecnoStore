@@ -2,6 +2,10 @@
 
 package MODELO;
 
+/**
+ *
+ * @author camper
+ */
 public class Cliente {
 
     private int id;
