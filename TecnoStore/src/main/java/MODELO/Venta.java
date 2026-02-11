@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package MODELO;
 
 import java.time.LocalDate;
@@ -9,7 +13,7 @@ public class Venta {
     private Cliente cliente;
     private LocalDate fecha;
     private double total;
-    private ArrayList<DetalleVenta> detalles;
+    private ArrayList<VentaItem> detalles;
 
     public Venta() {
         detalles = new ArrayList<>();
@@ -43,11 +47,11 @@ public class Venta {
         return total;
     }
 
-    public ArrayList<DetalleVenta> getDetalles() {
+    public ArrayList<VentaItem> getDetalles() {
         return detalles;
     }
 
-    public void agregarDetalle(DetalleVenta detalle) {
+    public void agregarDetalle(VentaItem detalle) {
         detalles.add(detalle);
     }
 

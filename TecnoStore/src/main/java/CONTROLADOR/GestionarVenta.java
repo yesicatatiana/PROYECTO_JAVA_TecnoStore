@@ -1,8 +1,35 @@
-package CONTROLADOR;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package MODELO;
 
-import MODELO.Venta;
+/**
+ *
+ * @author camper
+ */
+public class VentaItem {
 
-public interface GestionarVenta {
+    private int id;
+    private Celular celular;
+    private double cantidad;
+    private double subtotal;
 
-    void guardar(Venta v);
+    public VentaItem(Celular celular, double cantidad) {
+        this.celular = celular;
+        this.cantidad = cantidad;
+        this.subtotal = celular.getPrecio() * cantidad;
+    }
+
+    public Celular getCelular() {
+        return celular;
+    }
+
+    public double getCantidad() {
+        return cantidad;
+    }
+
+    public double getSubtotal() {
+        return subtotal;
+    }
 }
