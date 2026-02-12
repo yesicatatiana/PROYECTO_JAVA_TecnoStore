@@ -1,11 +1,6 @@
 
-
 package MODELO;
 
-/**
- *
- * @author camper
- */
 public class Cliente {
 
     private int id;
@@ -30,15 +25,23 @@ public class Cliente {
     }
 
     public void setId(int id) {
-        this.id = id;
-    }    
+        if (id > 0) {
+            this.id = id;
+        } else {
+            throw new IllegalArgumentException("El id debe ser positivo");
+        }
+    }
 
     public String getNombre() {
         return nombre;
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        if (!nombre.isBlank()) {
+            this.nombre = nombre;
+        } else {
+            throw new IllegalArgumentException("El nombre no puede estar vacio");
+        }
     }
 
     public String getIdentificacion() {
@@ -46,7 +49,11 @@ public class Cliente {
     }
 
     public void setIdentificacion(String identificacion) {
-        this.identificacion = identificacion;
+        if (!identificacion.isBlank()) {
+            this.identificacion = identificacion;
+        } else {
+            throw new IllegalArgumentException("La identificacion no puede estar vacia");
+        }
     }
 
     public String getCorreo() {
@@ -54,7 +61,11 @@ public class Cliente {
     }
 
     public void setCorreo(String correo) {
-        this.correo = correo;
+        if (correo.contains("@")) {
+            this.correo = correo;
+        } else {
+            throw new IllegalArgumentException("Correo invalido");
+        }
     }
 
     public String getTelefono() {
@@ -62,7 +73,11 @@ public class Cliente {
     }
 
     public void setTelefono(String telefono) {
-        this.telefono = telefono;
+        if (!telefono.isBlank()) {
+            this.telefono = telefono;
+        } else {
+            throw new IllegalArgumentException("Telefono invalido");
+        }
     }
 
     @Override

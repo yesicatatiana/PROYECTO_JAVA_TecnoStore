@@ -11,7 +11,7 @@ public class Celular {
     private String marca;
     private String modelo;
     private String sistemaOperativo;
-    private String gama; // Baja, Media, Alta
+    private String gama; 
     private int precio;
     private int stock;
 

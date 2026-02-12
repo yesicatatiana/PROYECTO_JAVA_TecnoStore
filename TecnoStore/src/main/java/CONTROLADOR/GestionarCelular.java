@@ -15,4 +15,7 @@ public interface GestionarCelular {
     ArrayList<Celular> listar();
 
     Celular buscar(int id);
+
+    void mostrarStockBajo(); 
 }
+

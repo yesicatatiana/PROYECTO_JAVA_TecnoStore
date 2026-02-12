@@ -33,7 +33,7 @@ public class Menu_Venta {
 
         venta.setCliente(cliente);
 
-        int opcion;
+        int opcion = 0;
 
         do {
 
@@ -59,7 +59,7 @@ public class Menu_Venta {
                 continue;
             }
 
-            venta.agregarDetalle(new DetalleVenta(cel, cantidad));
+            venta.agregarDetalle(new Venta(cel, cantidad));
 
             System.out.println("¿Agregar otro producto? 1=SI / 2=NO");
             opcion = sc.nextInt();
@@ -71,5 +71,9 @@ public class Menu_Venta {
         System.out.println("TOTAL CON IVA: " + venta.getTotal());
 
         gv.guardar(venta);
+    }
+
+    void menu() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

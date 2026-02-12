@@ -1,22 +1,21 @@
 
-
 package CONTROLADOR;
 
 import MODELO.Cliente;
-import java.sql.PreparedStatement;
+import java.sql.*;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 public class GestionarClienteImpl implements GestionarCliente {
 
-    Conexion c = new Conexion();
+    private final Conexion c = new Conexion();
 
     @Override
     public void guardar(Cliente cl) {
-        try (Connection con = c.conectar()) {
 
-            PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO cliente(nombre, identificacion, correo, telefono) VALUES (?,?,?,?)");
+        String sql = "INSERT INTO cliente(nombre, identificacion, correo, telefono) VALUES (?,?,?,?)";
+
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, cl.getNombre());
             ps.setString(2, cl.getIdentificacion());
@@ -33,10 +32,11 @@ public class GestionarClienteImpl implements GestionarCliente {
 
     @Override
     public void actualizar(Cliente cl, int id) {
-        try (Connection con = c.conectar()) {
 
-            PreparedStatement ps = con.prepareStatement(
-                    "UPDATE cliente SET nombre=?, identificacion=?, correo=?, telefono=? WHERE id=?");
+        String sql = "UPDATE cliente SET nombre=?, identificacion=?, correo=?, telefono=? WHERE id=?";
+
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, cl.getNombre());
             ps.setString(2, cl.getIdentificacion());
@@ -44,8 +44,13 @@ public class GestionarClienteImpl implements GestionarCliente {
             ps.setString(4, cl.getTelefono());
             ps.setInt(5, id);
 
-            ps.executeUpdate();
-            System.out.println("ACTUALIZACION EXITOSA!");
+            int filas = ps.executeUpdate();
+
+            if (filas > 0) {
+                System.out.println("ACTUALIZACION EXITOSA!");
+            } else {
+                System.out.println("No se encontro el cliente");
+            }
 
         } catch (SQLException e) {
             System.out.println("Error al actualizar: " + e.getMessage());
@@ -54,19 +59,20 @@ public class GestionarClienteImpl implements GestionarCliente {
 
     @Override
     public void eliminar(int id) {
-        try (Connection con = c.conectar()) {
 
-            PreparedStatement ps = con.prepareStatement("DELETE FROM cliente WHERE id=?");
+        String sql = "DELETE FROM cliente WHERE id=?";
+
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, id);
 
-            int op = JOptionPane.showConfirmDialog(null,
-                    "¿Desea eliminar el cliente?", null, JOptionPane.YES_NO_OPTION);
+            int filas = ps.executeUpdate();
 
-            if (op == 0) {
-                ps.executeUpdate();
+            if (filas > 0) {
                 System.out.println("ELIMINACION EXITOSA!");
             } else {
-                System.out.println("Operacion cancelada");
+                System.out.println("Cliente no encontrado");
             }
 
         } catch (SQLException e) {
@@ -78,14 +84,13 @@ public class GestionarClienteImpl implements GestionarCliente {
     public ArrayList<Cliente> listar() {
 
         ArrayList<Cliente> clientes = new ArrayList<>();
+        String sql = "SELECT * FROM cliente";
 
-        try (Connection con = c.conectar()) {
-
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM cliente");
+        try (Connection con = c.conectar();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-
                 clientes.add(new Cliente(
                         rs.getInt("id"),
                         rs.getString("nombre"),
@@ -106,11 +111,10 @@ public class GestionarClienteImpl implements GestionarCliente {
     public Cliente buscar(int id) {
 
         Cliente cl = null;
+        String sql = "SELECT * FROM cliente WHERE id=?";
 
-        try (Connection con = c.conectar()) {
-
-            PreparedStatement ps = con.prepareStatement(
-                    "SELECT * FROM cliente WHERE id=?");
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();

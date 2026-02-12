@@ -16,15 +16,8 @@ public class Venta {
     private ArrayList<VentaItem> detalles;
 
     public Venta() {
-        detalles = new ArrayList<>();
-        fecha = LocalDate.now();
-    }
-
-    public Venta(int id, Cliente cliente, LocalDate fecha, double total) {
-        this.id = id;
-        this.cliente = cliente;
-        this.fecha = fecha;
-        this.total = total;
+        this.detalles = new ArrayList<>();
+        this.fecha = LocalDate.now();
     }
 
     public int getId() {
@@ -57,20 +50,19 @@ public class Venta {
 
     public void calcularTotal() {
         double subtotal = detalles.stream()
-                .mapToDouble(d -> d.getSubtotal())
+                .mapToDouble(VentaItem::getSubtotal)
                 .sum();
 
-        total = subtotal + (subtotal * 0.19); // IVA 19%
+        total = subtotal * 1.19; // IVA 19%
     }
 
     @Override
     public String toString() {
         return """
                *****************************
-               Venta ID:      %s
                Cliente:       %s
                Fecha:         %s
                Total (IVA):   %.2f
-               """.formatted(id, cliente.getNombre(), fecha, total);
+               """.formatted(cliente.getNombre(), fecha, total);
     }
 }

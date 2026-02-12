@@ -1,64 +1,133 @@
+
 package CONTROLADOR;
 
-import MODELO.*;
-import java.sql.*;
-import java.util.ArrayList;
+import MODELO.Celular;
+import MODELO.Venta;
+import MODELO.VentaItem;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+
 
 public class GestionarVentaImpl implements GestionarVenta {
 
     Conexion c = new Conexion();
-    GestionarCelular gc = new GestionarCelularImpl();
 
     @Override
     public void guardar(Venta v) {
 
-        try (Connection con = c.conectar()) {
+        Connection con = null;
 
+        try {
+            con = c.conectar();
             con.setAutoCommit(false);
 
-            // 1️⃣ Insertar venta
-            PreparedStatement psVenta = con.prepareStatement(
-                    "INSERT INTO venta(id_cliente, fecha, total) VALUES (?,?,?)",
-                    Statement.RETURN_GENERATED_KEYS);
+            String sqlVenta = "INSERT INTO venta(id_cliente, fecha, total) VALUES (?,?,?)";
 
-            psVenta.setInt(1, v.getCliente().getId());
-            psVenta.setDate(2, Date.valueOf(v.getFecha()));
-            psVenta.setDouble(3, v.getTotal());
-            psVenta.executeUpdate();
+            try (PreparedStatement psVenta = con.prepareStatement(
+                    sqlVenta, Statement.RETURN_GENERATED_KEYS)) {
 
-            ResultSet rs = psVenta.getGeneratedKeys();
-            rs.next();
-            int idVenta = rs.getInt(1);
+                psVenta.setInt(1, v.getCliente().getId());
+                psVenta.setDate(2, Date.valueOf(v.getFecha()));
+                psVenta.setDouble(3, v.getTotal());
+                psVenta.executeUpdate();
 
-            // 2️⃣ Insertar detalles
-            for (DetalleVenta d : v.getDetalles()) {
+                ResultSet rs = psVenta.getGeneratedKeys();
 
-                PreparedStatement psDetalle = con.prepareStatement(
-                        "INSERT INTO detalle_venta(id_venta, id_celular, cantidad, subtotal) VALUES (?,?,?,?)");
+                if (!rs.next()) {
+                    throw new SQLException("No se pudo obtener ID venta");
+                }
 
-                psDetalle.setInt(1, idVenta);
-                psDetalle.setInt(2, d.getCelular().getId());
-                psDetalle.setDouble(3, d.getCantidad());
-                psDetalle.setDouble(4, d.getSubtotal());
-                psDetalle.executeUpdate();
+                int idVenta = rs.getInt(1);
 
-                // 3️⃣ Actualizar stock
-                Celular cel = d.getCelular();
-                int nuevoStock = cel.getStock() - (int) d.getCantidad();
+                
+                for (VentaItem item : v.getDetalles()) {
 
-                PreparedStatement psStock = con.prepareStatement(
-                        "UPDATE celular SET stock=? WHERE id=?");
+                    Celular cel = item.getCelular();
 
-                psStock.setInt(1, nuevoStock);
-                psStock.setInt(2, cel.getId());
-                psStock.executeUpdate();
+                    if (cel.getStock() < item.getCantidad()) {
+                        throw new SQLException("Stock insuficiente ID: " + cel.getId());
+                    }
+
+                    String sqlDetalle = "INSERT INTO detalle_venta(id_venta,id_celular,cantidad,subtotal) VALUES (?,?,?,?)";
+
+                    try (PreparedStatement psDetalle = con.prepareStatement(sqlDetalle)) {
+
+                        psDetalle.setInt(1, idVenta);
+                        psDetalle.setInt(2, cel.getId());
+                        psDetalle.setInt(3, item.getCantidad());
+                        psDetalle.setDouble(4, item.getSubtotal());
+                        psDetalle.executeUpdate();
+                    }
+
+                    // Actualizar stock
+                    String sqlStock = "UPDATE celular SET stock = stock - ? WHERE id=?";
+
+                    try (PreparedStatement psStock = con.prepareStatement(sqlStock)) {
+                        psStock.setInt(1, item.getCantidad());
+                        psStock.setInt(2, cel.getId());
+                        psStock.executeUpdate();
+                    }
+                }
             }
 
             con.commit();
-            System.out.println("VENTA REGISTRADA EXITOSAMENTE!");
+            System.out.println("VENTA REGISTRADA CORRECTAMENTE");
 
         } catch (SQLException e) {
-            System.out.println("Error en la venta: " + e.getMessage());
+
+            try {
+                if (con != null) con.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Error rollback: " + ex.getMessage());
+            }
+
+            System.out.println("Error en venta: " + e.getMessage());
+
+        } finally {
+
+            try {
+                if (con != null) {
+                    con.setAutoCommit(true);
+                    con.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error cerrando conexión");
+            }
+        }
+    }
+
+    @Override
+    public void ventasPorMes() {
+
+        String sql = """
+            SELECT DATE_FORMAT(fecha,'%Y-%m') AS mes,
+                   SUM(total) AS total_mensual
+            FROM venta
+            GROUP BY mes
+            ORDER BY mes
+        """;
+
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            System.out.println("VENTAS POR MES");
+            System.out.println("----------------");
+
+            while (rs.next()) {
+                System.out.println(
+                        "Mes: " + rs.getString("mes") +
+                        " | Total: $" + rs.getDouble("total_mensual")
+                );
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Error ventas por mes: " + e.getMessage());
         }
     }
 }

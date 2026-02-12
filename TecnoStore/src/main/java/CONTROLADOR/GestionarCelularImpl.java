@@ -1,10 +1,14 @@
 
+
 package CONTROLADOR;
 
 import MODELO.Celular;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 public class GestionarCelularImpl implements GestionarCelular {
 
@@ -13,10 +17,10 @@ public class GestionarCelularImpl implements GestionarCelular {
     @Override
     public void guardar(Celular cel) {
 
-        try (Connection con = c.conectar()) {
+        String sql = "INSERT INTO celular(marca, modelo, sistema_operativo, gama, precio, stock) VALUES (?,?,?,?,?,?)";
 
-            PreparedStatement ps = con.prepareStatement(
-                    "INSERT INTO celular(marca, modelo, sistema_operativo, gama, precio, stock) VALUES (?,?,?,?,?,?)");
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, cel.getMarca());
             ps.setString(2, cel.getModelo());
@@ -36,10 +40,10 @@ public class GestionarCelularImpl implements GestionarCelular {
     @Override
     public void actualizar(Celular cel, int id) {
 
-        try (Connection con = c.conectar()) {
+        String sql = "UPDATE celular SET marca=?, modelo=?, sistema_operativo=?, gama=?, precio=?, stock=? WHERE id=?";
 
-            PreparedStatement ps = con.prepareStatement(
-                    "UPDATE celular SET marca=?, modelo=?, sistema_operativo=?, gama=?, precio=?, stock=? WHERE id=?");
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, cel.getMarca());
             ps.setString(2, cel.getModelo());
@@ -60,20 +64,15 @@ public class GestionarCelularImpl implements GestionarCelular {
     @Override
     public void eliminar(int id) {
 
-        try (Connection con = c.conectar()) {
+        String sql = "DELETE FROM celular WHERE id=?";
 
-            PreparedStatement ps = con.prepareStatement("DELETE FROM celular WHERE id=?");
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
             ps.setInt(1, id);
+            ps.executeUpdate();
 
-            int op = JOptionPane.showConfirmDialog(null,
-                    "¿Desea eliminar el celular?", null, JOptionPane.YES_NO_OPTION);
-
-            if (op == 0) {
-                ps.executeUpdate();
-                System.out.println("ELIMINACION EXITOSA!");
-            } else {
-                System.out.println("Operacion cancelada");
-            }
+            System.out.println("ELIMINACION EXITOSA!");
 
         } catch (SQLException e) {
             System.out.println("Error al eliminar: " + e.getMessage());
@@ -85,10 +84,11 @@ public class GestionarCelularImpl implements GestionarCelular {
 
         ArrayList<Celular> celulares = new ArrayList<>();
 
-        try (Connection con = c.conectar()) {
+        String sql = "SELECT * FROM celular";
 
-            Statement st = con.createStatement();
-            ResultSet rs = st.executeQuery("SELECT * FROM celular");
+        try (Connection con = c.conectar();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
 
@@ -114,26 +114,27 @@ public class GestionarCelularImpl implements GestionarCelular {
     public Celular buscar(int id) {
 
         Celular cel = null;
+        String sql = "SELECT * FROM celular WHERE id=?";
 
-        try (Connection con = c.conectar()) {
-
-            PreparedStatement ps = con.prepareStatement(
-                    "SELECT * FROM celular WHERE id=?");
+        try (Connection con = c.conectar();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
 
-            if (rs.next()) {
+            try (ResultSet rs = ps.executeQuery()) {
 
-                cel = new Celular(
-                        rs.getInt("id"),
-                        rs.getString("marca"),
-                        rs.getString("modelo"),
-                        rs.getString("sistema_operativo"),
-                        rs.getString("gama"),
-                        rs.getInt("precio"),
-                        rs.getInt("stock")
-                );
+                if (rs.next()) {
+
+                    cel = new Celular(
+                            rs.getInt("id"),
+                            rs.getString("marca"),
+                            rs.getString("modelo"),
+                            rs.getString("sistema_operativo"),
+                            rs.getString("gama"),
+                            rs.getInt("precio"),
+                            rs.getInt("stock")
+                    );
+                }
             }
 
         } catch (SQLException e) {
@@ -141,5 +142,15 @@ public class GestionarCelularImpl implements GestionarCelular {
         }
 
         return cel;
+    }
+
+    @Override
+    public void mostrarStockBajo() {
+
+        System.out.println("CELULARES CON STOCK BAJO (<5)");
+
+        listar().stream()
+                .filter(cel -> cel.getStock() < 5)
+                .forEach(System.out::println);
     }
 }

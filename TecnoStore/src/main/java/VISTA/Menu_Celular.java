@@ -1,4 +1,3 @@
-
 package VISTA;
 
 import CONTROLADOR.GestionarCelular;
@@ -55,8 +54,6 @@ public class Menu_Celular {
 
         if (cel != null) {
 
-            System.out.println(cel);
-
             try {
 
                 System.out.println("Nueva marca:");
@@ -91,24 +88,25 @@ public class Menu_Celular {
     }
 
     private void eliminar() {
+
         System.out.println("Ingrese id del celular:");
         int id = sc.nextInt();
+        sc.nextLine();
+
         gc.eliminar(id);
     }
 
     private void listar() {
 
         ArrayList<Celular> lista = gc.listar();
-
-        for (Celular cel : lista) {
-            System.out.println(cel);
-        }
+        lista.forEach(System.out::println);
     }
 
     private void buscar() {
 
         System.out.println("Ingrese id del celular:");
         int id = sc.nextInt();
+        sc.nextLine();
 
         Celular cel = gc.buscar(id);
 
@@ -133,7 +131,8 @@ public class Menu_Celular {
                     3. Eliminar
                     4. Listar
                     5. Buscar
-                    6. Salir
+                    6. Mostrar stock bajo
+                    7. Salir
                     """);
 
             op = sc.nextInt();
@@ -145,8 +144,11 @@ public class Menu_Celular {
                 case 3 -> eliminar();
                 case 4 -> listar();
                 case 5 -> buscar();
+                case 6 -> gc.mostrarStockBajo();
+                case 7 -> System.out.println("Saliendo...");
+                default -> System.out.println("Opcion invalida");
             }
 
-        } while (op != 6);
+        } while (op != 7);
     }
 }
