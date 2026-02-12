@@ -318,34 +318,3 @@ Contraseña
 
 Ejecutar la clase principal Menu.
 
-🔮 Posibles Mejoras Futuras
-
-Implementar patrón DAO
-
-Validaciones más robustas en Vista
-
-Manejo de logs
-
-Pruebas unitarias
-
-Interfaz gráfica (JavaFX / Swing)
-
-Sistema de autenticación
-
-Control de concurrencia
-
-🎯 Conclusión
-
-El sistema cumple con los requerimientos de gestión de inventario y ventas, implementando correctamente:
-
-Arquitectura MVC
-
-Transacciones
-
-Relaciones entre tablas
-
-Lógica de negocio
-
-Integridad de datos
-
-Es un sistema funcional, estructurado y escalable a mejoras futuras.
