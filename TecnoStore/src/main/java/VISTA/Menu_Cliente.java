@@ -143,3 +143,82 @@ public class Menu_Cliente {
         } while (op != 6);
     }
 }
+
+
+
+
+    
+    public List<IngresoMarca> ordenarPorIngresoDesc(List<IngresoMarca> ingresos) {
+        return ingresos.stream()
+                .sorted(Comparator.comparingDouble(IngresoMarca::getTotalIngreso).reversed())
+                .collect(Collectors.toList());
+    }
+
+    
+    public void generarArchivoReporte(List<IngresoMarca> ingresos) throws IOException {
+
+        String mesActual = LocalDate.now()
+                .getMonth()
+                .getDisplayName(TextStyle.FULL, new Locale("es", "ES"));
+
+        try (FileWriter writer = new FileWriter("reporte_ingresos_marca.txt")) {
+
+            writer.write("--- REPORTE DE INGRESOS POR MARCA (" 
+                    + mesActual.toUpperCase() + " " 
+                    + LocalDate.now().getYear() + ") ---\n");
+
+            int i = 1;
+            for (IngresoMarca ingreso : ingresos) {
+                writer.write(i++ + ". " 
+                        + ingreso.getMarca() 
+                        + " → $" 
+                        + String.format("%,.0f", ingreso.getTotalIngreso()) 
+                        + "\n");
+            }
+        }
+    }
+}
+
+
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.util.List;
+
+public class ReporteConsola {
+
+    public static void main(String[] args) {
+
+        try (Connection conn = DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/tienda",
+                "root",
+                "1234")) {
+
+            ReporteFinancieroService service = new ReporteFinancieroService(conn);
+
+            List<IngresoMarca> ingresos = service.obtenerIngresosPorMarcaMesActual();
+            ingresos = service.ordenarPorIngresoDesc(ingresos);
+
+            // Mostrar en consola
+            System.out.println("--- REPORTE DE INGRESOS POR MARCA ---");
+
+            int i = 1;
+            for (IngresoMarca ingreso : ingresos) {
+                System.out.println(i++ + ". " 
+                        + ingreso.getMarca() 
+                        + " → $" 
+                        + String.format("%,.0f", ingreso.getTotalIngreso()));
+            }
+
+            // Generar archivo
+            service.generarArchivoReporte(ingresos);
+
+            System.out.println("Archivo generado: reporte_ingresos_marca.txt");
+
+        } catch (Exception e) {
+            System.err.println("Error al generar el reporte: " + e.getMessage());
+        }
+    }
+}
+
+

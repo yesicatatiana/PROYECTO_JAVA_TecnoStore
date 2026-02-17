@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 
 
@@ -131,3 +132,36 @@ public class GestionarVentaImpl implements GestionarVenta {
         }
     }
 }
+
+
+    @Override
+    public List<IngresoMarca> obtenerIngresosPorMarcaMesActual() throws SQLException {
+
+        String sql = """
+            SELECT c.marca, SUM(v.precio_venta) AS total
+            FROM venta v
+            JOIN celular c ON v.id_celular = c.id
+            WHERE MONTH(v.fecha_venta) = MONTH(CURRENT_DATE())
+              AND YEAR(v.fecha_venta) = YEAR(CURRENT_DATE())
+            GROUP BY c.marca
+        """;
+
+        List<IngresoMarca> lista = new ArrayList<>();
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                lista.add(new IngresoMarca(
+                        rs.getString("marca"),
+                        rs.getDouble("total")
+                ));
+            }
+        }
+
+        if (lista.isEmpty()) {
+            throw new IllegalStateException("No existen ventas registradas este mes.");
+        }
+
+        return lista;
+    }
